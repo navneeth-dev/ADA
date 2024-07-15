@@ -35,8 +35,8 @@ void dijkstras(int c[][100], int n, int src) {
         vis[j] = 0;                                 // Marking the visited nodes as 0
     }
 
-    dist[src] = 0;
-    vis[src] = 1;
+    dist[src] = 0;                                   // Marking the distance of the source node to itself as 0
+    vis[src] = 1;                                    // Marking that source has been visited
     count = 1;
 
     // Main loop
