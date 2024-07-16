@@ -1,10 +1,11 @@
+
 #include <stdio.h>
 #define MAX 9999 // Infinity value assumed
 
-void dijkstras(int c[][100], int n, int src);
+void kruskals(int c[][100], int n);
 
 int main() {
-    int n, src, i, j;
+    int n, i, j;
     int c[100][100]; // Assuming a maximum size for the cost matrix
 
     printf("Enter the number of nodes: ");
@@ -14,58 +15,57 @@ int main() {
     for (i = 1; i <= n; i++) {
         for (j = 1; j <= n; j++) {
             scanf("%d", &c[i][j]);
+            if (c[i][j] == 0) // Assuming 0 represents no edge, set it to a large value
+                c[i][j] = MAX;
         }
     }
 
-    printf("Enter the source node (1 to %d): ", n);
-    scanf("%d", &src);
-
-    dijkstras(c, n, src);
+    kruskals(c, n);
 
     return 0;
 }
 
-void dijkstras(int c[][100], int n, int src) {
-    int dist[100], vis[100];
-    int count, min, u, i, j;
+void kruskals(int c[][100], int n) {
+    int ne = 0, mincost = 0;
+    int parent[100]; // To store parent array for union-find operation
+    int min, u, v, a, b, i, j;
 
-    // Initialization
-    for (j = 1; j <= n; j++) {
-        dist[j] = c[src][j];
-        vis[j] = 0;
-    }
+    // Initialize parent array
+    for (i = 1; i <= n; i++)
+        parent[i] = 0;
 
-    dist[src] = 0;
-    vis[src] = 1;
-    count = 1;
-
-    // Main loop
-    while (count != n) {
+    while (ne != n - 1) {
         min = MAX;
 
-        // Find the minimum distance vertex from the set of vertices not yet processed
-        for (j = 1; j <= n; j++) {
-            if (dist[j] < min && vis[j] != 1) {
-                min = dist[j];
-                u = j;
+        // Find the minimum edge in the cost matrix
+        for (i = 1; i <= n; i++) {
+            for (j = 1; j <= n; j++) {
+                if (c[i][j] < min) {
+                    min = c[i][j];
+                    u = a = i;
+                    v = b = j;
+                }
             }
         }
 
-        vis[u] = 1;
-        count++;
+        // Check for cycle using union-find (path compression) technique
+        while (parent[u] != 0)
+            u = parent[u];
 
-        // Update dist value of the adjacent vertices of the picked vertex
-        for (j = 1; j <= n; j++) {
-            if (min + c[u][j] < dist[j] && vis[j] != 1) {
-                dist[j] = min + c[u][j];
-            }
+        while (parent[v] != 0)
+            v = parent[v];
+
+        if (u != v) {
+            printf("Edge %d-%d: %d\n", a, b, min);
+            parent[v] = u; // Union operation
+            mincost += min;
+            ne++;
         }
+
+        c[a][b] = c[b][a] = MAX; // Mark the edge as processed
     }
 
-    // Output shortest distances
-    printf("Shortest distances from node %d:\n", src);
-    for (j = 1; j <= n; j++) {
-        printf("Distance to node %d from node %d: %d\n", j, src, dist[j]);
-    }
+    printf("Minimum cost of spanning tree: %d\n", mincost);
 }
+
 
