@@ -1,91 +1,66 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 
-#define MAX 9999 // Infinity value for initial comparisons
-
-void prims(int n, int cost[n][n]) {
-    int i, j, u, min, sum = 0, source, K = 0;
-    int S[n], d[n], P[n], T[n-1][2]; // T will store the edges of MST
-
-    // Step 1: Find a source vertex with minimum edge going out
-    min = MAX;
-    source = 0;
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            if (cost[i][j] != 0 && cost[i][j] < min) {
+void main(){
+    printf("Enter number of vertices: ");
+    int n;
+    scanf("%d", &n);
+    int cost[n][n];
+    printf("Enter cost adjacency matrix: ");
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            scanf("%d", &cost[i][j]);
+        }
+    }
+    int min = INT_MAX, source = 0;
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            if(cost[i][j] != 0 && cost[i][j] < min){
                 min = cost[i][j];
                 source = i;
             }
         }
     }
-
-    // Step 2: Initialization
-    for (i = 0; i < n; i++) {
-        S[i] = 0; // Not yet included in MST
-        d[i] = cost[source][i]; // Initialize distances with cost from source
-        P[i] = source; // Parent of each vertex initially is the source
+    int s[n], d[n], p[n];
+    for(int i = 0; i < n; i++){
+        s[i] = 0;
+        d[i] = cost[source][i];
+        p[i] = source;
     }
-
-    // Step 3: Add source to S (visited set)
-    S[source] = 1;
-
-    // Step 4: Find MST edges
-    for (i = 1; i < n; i++) {
-        // Find u such that d[u] is minimum and u is not in S
-        min = MAX;
-        u = -1;
-        for (j = 0; j < n; j++) {
-            if (S[j] == 0 && d[j] <= min) {
+    s[source] = 1;
+    int sum = 0, k = 0, t[n][2];
+    for(int i = 0; i < n; i++){
+        min = INT_MAX;
+        int u = -1;
+        for(int j = 0; j < n; j++){
+            if(s[j] == 0 && d[j] <= min){
                 min = d[j];
                 u = j;
             }
         }
+        if (u == -1) break;
 
-        // Add edge to MST
-        T[K][0] = u;
-        T[K][1] = P[u];
-        K++;
-
-        // Add cost of edge to MST sum
-        sum += cost[u][P[u]];
-
-        // Add u to S (visited set)
-        S[u] = 1;
-
-        // Update d[] and P[] for adjacent vertices not in S
-        for (j = 0; j < n; j++) {
-            if (S[j] == 0 && cost[u][j] < d[j]) {
+        t[k][0] = u;
+        t[k][1] = p[u];
+        k++;
+        sum += cost[u][p[u]];
+        s[u] = 1;
+        for(int j = 0; j < n; j++){
+            if(s[j] == 0 && cost[u][j] < d[j]){
                 d[j] = cost[u][j];
-                P[j] = u;
+                p[j] = u;
             }
         }
     }
-
-    // Step 5: Check if MST exists
-    if (sum >= MAX) {
-        printf("Spanning tree does not exist.\n");
-    } else {
-        printf("Spanning tree exists and MST is:\n");
-        for (i = 0; i < n-1; i++) {
-            printf("%d - %d\n", T[i][0], T[i][1]);
-        }
-        printf("The cost of spanning tree (MST) is %d\n", sum);
+    if(sum >= INT_MAX){
+        printf("Spanning tree does not exist");
     }
-}
-
-int main() {
-    int n;
-    printf("Enter number of vertices: ");
-    scanf("%d", &n);
-
-    int cost[n][n];
-    printf("Enter the cost adjacency matrix:\n");
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            scanf("%d", &cost[i][j]);
+    else{
+        printf("MST is:\n");
+        for(int i = 0; i < k; i++){
+            printf("(%d, %d) ", t[i][0] + 1, t[i][1] + 1);
         }
+        printf("\nThe cost of MST is %d", sum);
     }
-
-    prims(n, cost);
-
-    return 0;
 }
