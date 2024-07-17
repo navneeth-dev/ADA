@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #define MAX 9999 // Infinity value assumed
 
